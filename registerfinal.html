@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="styleregister.css">
+</head>
+
+<body>
+    <style>
+        /* CSS stylesheet for registration */ 
+
+       label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        input, select {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        select {
+            width: 100%;
+        }
+        button {
+            background-color: blue;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
+        .registration-box {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+    
+        }
+        .registration-box h2 {
+            text-align: center;
+        }
+    </style>
+
+    <div class="registration-box">
+        <h2>Registration</h2>
+        <label>Name</label> <input id="Namebox" type="text">  
+        <label>Gender</label> 
+        <select id="Genbox">
+            <option value ="Male">Male</option>
+            <option value ="Female">Female</option>
+            <option value ="Others">Others</option>
+        </select>
+        <label>Email</label> <input id="Emailbox" type="text"> 
+        <label>Password</label> <input id="Passwordbox" type="password"> 
+        <label>Confirm Password</label> <input id="CPasswordbox" type="password"> 
+        <label>TelegramID</label> <input id="TelegramIDbox" type="text"> 
+        <label>Contact</label>
+        <select id="Contactbox">
+            <option value ="Yes">Yes</option>
+            <option value ="No">No</option>
+        </select>
+    
+        <hr>
+    
+        <button id="Registerbtn">REGISTER</button>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+        // Your Firebase SDK configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbyiewHyshcRadjps4bYrs1IhoDcyJPgM",
+            authDomain: "sc2006-website.firebaseapp.com",
+            databaseURL: "https://sc2006-website-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sc2006-website",
+            storageBucket: "sc2006-website.appspot.com",
+            messagingSenderId: "140548370620",
+            appId: "1:140548370620:web:c2f845e99edb812c4e60b9",
+            measurementId: "G-5GWV6T127Q"
+        };
+        // Initialize Firebase app
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+      
+
+        import {getFirestore, doc, getDoc,setDoc,collection, addDoc,updateDoc,deleteDoc,deleteField} 
+        from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js"
+
+        const db = getFirestore();
+
+        let Namebox = document.getElementById('Namebox');
+        let Genbox= document.getElementById('Genbox');
+        let Emailbox = document.getElementById('Emailbox');
+        let Passwordbox = document.getElementById('Passwordbox');
+        let CPasswordbox = document.getElementById('CPasswordbox');
+        let TelegramIDBox = document.getElementById('TelegramIDbox');
+        let ContactBox = document.getElementById('Contactbox');
+
+        let Registerbtn = document.getElementById("Registerbtn");
+        
+        // Define an asynchronous function called AddDocument_AutoID
+        async function registerUser() {
+            const email = Emailbox.value.trim();
+            const password = Passwordbox.value.trim();
+            try {
+              const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+              const user = userCredential.user;
+              console.log("User registered successfully:", user);
+              // Add user data to Firestore
+              AddDocument_AutoID(user);
+            } catch (error) {
+              console.error("Error registering user:", error);
+              // Show error message to user
+              alert(error.message);
+            } 
+          }
+
+          async function AddDocument_AutoID() {
+            // Use validation functions to check if form inputs are valid
+            if (validateName() && validateEmail() && validatePassword() && validateConfirmPassword() && validateTelegramID() && validateContact()&&validateGender()) {
+            // Get the email value from the email input field and remove any leading/trailing white space
+            const email = Emailbox.value.trim();
+            // Create a reference to the document in the "Userlist" collection with the specified email
+            const userRef = doc(db, "Userlist", email);
+            // Get the document with the specified email from the "Userlist" collection
+            const userDoc = await getDoc(userRef);
+            // If the document already exists, display an alert message
+            if (userDoc.exists()) {
+                alert("User with this email is already registered.");
+            } else {
+                try {
+                // If the document doesn't exist, create a new document in the "Userlist" collection with the specified email and set its field values
+                const docRef = await setDoc(userRef, {
+                    full_name: Namebox.value,
+                    Gender: Genbox.value,
+                    Email: email,
+                    Password: Passwordbox.value,
+                    Confirm_Password: CPasswordbox.value,
+                    TelegramID: TelegramIDBox.value,
+                    Contact: ContactBox.value
+                });
+                // Display a success message and redirect the user to the mainpage.html page
+                alert("Successful Registration!! Press OK to continue");
+                window.location.href = "/mainpage.html";
+                } catch (error) {
+                // If there was an error creating the new document, display an error message
+                alert("Unsuccessful Registration!, error: " + error);
+                }
+            }
+            }
+        }
+
+  
+          Registerbtn.addEventListener("click", registerUser);
+
+            // Validates the user's name
+        // Input: None
+        // Output: Boolean indicating whether the name is valid or not
+        function validateName(){
+            let name = Namebox.value.trim();
+
+            // Check if the name field is empty
+            if(name === ""){
+                alert("Please enter your name.");
+                return false;
+            }
+            // Check if the name contains only letters
+            else if(!/^[a-zA-Z]+$/.test(name)){
+                alert("Please enter a valid name.");
+                return false;
+            }
+            return true;
+        }
+
+        // Validates the user's email address
+        // Input: None
+        // Output: Boolean indicating whether the email address is valid or not
+        function validateEmail(){
+            let email = Emailbox.value.trim();
+
+            // Check if the email field is empty
+            if(email === ""){
+                alert("Please enter your email address.");
+                return false;
+            }
+            // Check if the email address has a valid format
+            else if(!/\S+@\S+\.\S+/.test(email)){
+                alert("Please enter a valid email address.");
+                return false;
+            }
+            return true;
+        }
+
+        // Validates the user's password
+        // Input: None
+        // Output: Boolean indicating whether the password is valid or not
+        function validatePassword(){
+            let password = Passwordbox.value.trim();
+
+            // Check if the password field is empty
+            if(password === ""){
+                alert("Please enter your password.");
+                return false;
+            }
+            // Check if the password has at least 6 characters
+            else if(password.length < 6){
+                alert("Please enter a password with at least 6 characters.");
+                return false;
+            }
+            // Check if the password has at least one special character
+            else if(!/[!@#$%^&*(),.?":{}|<>]/.test(password)){
+                alert("Please include at least one special character in your password.");
+                return false;
+            }
+            // Check if the password has at least one uppercase letter
+            else if(!/[A-Z]/.test(password)){
+                alert("Please include at least one uppercase letter in your password.");
+                return false;
+            }
+            // Check if the password has at least one lowercase letter
+            else if(!/[a-z]/.test(password)){
+                alert("Please include at least one lowercase letter in your password.");
+                return false;
+            }
+            return true;
+        }
+
+    
+        function validateConfirmPassword(){
+            // Get the password and confirm password values
+            let password = Passwordbox.value.trim();
+            let confirmPassword = CPasswordbox.value.trim();
+            // If confirm password is empty, show an alert and return false
+            if(confirmPassword === ""){
+                alert("Please confirm your password.");
+                return false;
+            }
+            // If confirm password does not match password, show an alert and return false
+            else if(confirmPassword !== password){
+                alert("Passwords do not match. Please try again.");
+                return false;
+            }
+            // Otherwise, return true
+            return true;
+        }
+        
+        function validateTelegramID(){
+            // Get the Telegram ID value
+            let telegramID = TelegramIDBox.value.trim();
+            // If Telegram ID is empty, show an alert and return false
+            if(telegramID === ""){
+                alert("Please enter your Telegram ID.");
+                return false;
+            }
+            // Otherwise, return true
+            return true;
+        }
+        
+        function validateContact(){
+            // Get the contact value
+            let contact = ContactBox.value.trim();
+            // If contact is empty, show an alert and return false
+            if(contact === ""){
+                alert("Please select an option for contact.");
+                return false;
+            }
+            // Otherwise, return true
+            return true;
+        }
+        
+        function validateGender(){
+            // Get the gender value
+            let gender = Genbox.value.trim();
+            // If gender is empty, show an alert and return false
+            if(gender === ""){
+                alert("Please select an option for gender.");
+                return false;
+            }
+            // Otherwise, return true
+            return true;
+        }
+        
+
+        </script>
+    </body>
+</html>

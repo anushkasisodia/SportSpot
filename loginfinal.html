@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <link rel="stylesheet" href="stylelogin.css">
+</head>
+<title>Login</title>
+	<style>
+		body {
+			background-image: url("background.jpg");
+			background-size: cover;
+			background-repeat: no-repeat;
+			background-position: center center;
+			height: 100vh;
+			margin: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		div {
+			border:1px solid black;
+			padding:20px;
+			width: 60%;
+			background-color: rgba(255, 255, 255, 0.8); /* translucent white */
+			text-align: center;
+		}
+		label {
+			font-weight:bold;
+			display:inline-block;
+			width: 100px;
+			margin-bottom: 10px;
+		}
+		input[type="text"],
+		input[type="password"] {
+			width: 60%;
+			padding: 5px;
+			margin-bottom: 10px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+		}
+		button {
+			font-weight:bold;
+			padding: 10px 20px;
+			background-color: darkblue;
+			color: white;
+			border-radius: 5px;
+			border: none;
+			cursor: pointer;
+		}
+		button:hover {
+			background-color: darkblue;
+		}
+	</style>
+</head>
+<body>
+	<div>
+		<h2>Login</h2>
+		<label>Email</label> <input id="Emailbox" type="text"><br>
+		<label>Password</label> <input id="Passwordbox" type="password"><br>
+		<button id ="Loginbtn">LOGIN</button>
+	</div>
+</body>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbyiewHyshcRadjps4bYrs1IhoDcyJPgM",
+            authDomain: "sc2006-website.firebaseapp.com",
+            databaseURL: "https://sc2006-website-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sc2006-website",
+            storageBucket: "sc2006-website.appspot.com",
+            messagingSenderId: "140548370620",
+            appId: "1:140548370620:web:26bea8bb411408da4e60b9",
+            measurementId: "G-NCGC3EKYZ2"
+          };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // get elements from DOM
+        let Emailbox = document.getElementById('Emailbox');
+        let Passwordbox = document.getElementById('Passwordbox');
+        let Loginbtn = document.getElementById("Loginbtn");
+
+        // function to authenticate user
+        async function Authenticate() {
+            const Email = Emailbox.value.trim();
+            const Password = Passwordbox.value.trim();
+
+            try {
+                // Sign in the user with Firebase Authentication
+                const userCredential = await signInWithEmailAndPassword(auth,Email,Password);
+
+                // Check if the user exists in the Firestore database
+                const userDocRef = doc(db, "Userlist", userCredential.user.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    // Redirect the user to the main page if the login is successful
+                    alert("Login successful!");
+                    window.location.href = "/mainpage.html";
+                } else {
+                    // Log out the user if they don't exist in the database
+                    await auth.signOut();
+                    alert("User not found.");
+                }
+            } catch (error) {
+                console.log(error);
+                // Handle authentication errors
+                if (error.code === "auth/user-not-found") {
+                    alert("User with this email does not exist.");
+                } else if (error.code === "auth/wrong-password") {
+                    alert("Invalid password!");
+                } else {
+                    console.error(error);
+                    alert("An error occurred. Please try again later.");
+                }
+            }
+        }
+
+        // add event listener to login button
+        Loginbtn.addEventListener("click", Authenticate);
+
+        // Set read and write permissions for the database
+        db.collection("Userlist").get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                console.log(`${doc.id} => ${doc.data()}`);
+            });
+        }
+        )
+        db.close();
+    </script>
+</body>

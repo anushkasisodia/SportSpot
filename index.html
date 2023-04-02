@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Facilities Recommendation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("/Users/anushkasmacbook/Desktop/finalsportspot/background.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h2 {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        label,
+        p {
+            display: block;
+            margin-bottom: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+        }
+
+        .sports-filter-container {
+            max-width: 600px;
+            text-align: center;
+            margin-left: 30%;
+            margin:auto;
+            background-color:rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .sports-filter {
+            margin-bottom: 20px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+        }
+        .container {
+            padding: 10px; /* Add some padding */
+            background-color: lightblue; /* Add a background color */
+            }
+
+
+        option {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+        }
+
+        #output {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            margin-top: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+        }
+
+        li:hover {
+            background-color: #e5e5e5;
+        }
+
+        #filterBtn {
+            background-color: darkblue;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 15px;
+        }
+
+        #filterBtn:hover {
+            background-color: #3e8e41;
+        }
+
+        /* Added styles for filters */
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .filter {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+        }
+
+        .filter label {
+            margin-right: 5px;
+        }
+        h3 {
+            font-size: 17px;
+            font-weight: normal;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="sports-filter-container">
+        <h1>Sports Facilities Recommendation</h1>
+        <h2>Choose Sports:</h2>
+        <label for="sport-filter"></label>
+        <select width="300" style="width: 350px" size="5" id="sport-filter" name="sportFilter" multiple class="sports-filter">
+            <option value="">All Sports</option>
+            <option value="Running">Running</option>
+            <option value="Basketball">Basketball</option>
+            <option value="Swimming">Swimming</option>
+            <option value="Yoga">Yoga</option>
+        </select>
+
+        <div class="container">
+            <p>Hold down the Ctrl (windows) / Command (Mac) button to select multiple options.</p>
+          </div>
+          
+
+        <!-- Location filter -->
+        <input type="checkbox" id="location-filter" label for="location-filter">Filter by Area</label>
+ 
+        <!-- Weather filter -->
+        <input type="checkbox" id="weather-filter" label for="weather-filter">Filter by Weather</label>
+
+        <button id="filterBtn">Filter</button>
+
+ <ul id="gymsList"></ul> <!--CHECK AGAIN-->
+
+ <h3>The result is: <span id="result"></span></h3>
+
+        </div>
+
+
+            
+            
+   <!-- <script type="module" src="apiScript.js"></script> -->
+    <script type="module" src="tempApiScript.js"></script> 
+    
+
+    <script type="module">
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"
+import { collection, setDoc, doc, getDocs, addDoc, Timestamp, updateDoc,deleteField,getDoc} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"
+import { query, orderBy, limit, where, onSnapshot } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"
+
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+    apiKey: "AIzaSyAbyiewHyshcRadjps4bYrs1IhoDcyJPgM",
+    authDomain: "sc2006-website.firebaseapp.com",
+    databaseURL: "https://sc2006-website-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "sc2006-website",
+    storageBucket: "sc2006-website.appspot.com",
+    messagingSenderId: "140548370620",
+    appId: "1:140548370620:web:26bea8bb411408da4e60b9",
+    measurementId: "G-NCGC3EKYZ2"
+};
+
+
+// Initialize Firebasec(database)
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+//To store references to three HTML elements in a web page with specific IDs.
+const sportFilter = document.getElementById("sport-filter"); 
+const locationFilter = document.getElementById("location-filter");
+const weatherFilter = document.getElementById("weather-filter");
+
+
+let queryref = collection(db,"Gym_collection");
+let q3; //To store query results from Firestore
+
+//Array to store the filtered results
+let sportFilArr = []; 
+let weaFilArray = [];
+let locFilArr = []
+
+// Declare global variables to be used in location filter
+let dataLong;
+let dataLat;
+let userLat;
+let userLong;
+
+//Event listener for filter button and set the filter array as empty at the start
+filterBtn.addEventListener("click", () => {
+    sportFilArr = []; 
+    weaFilArray = [];
+    locFilArr = [];
+   
+    getFilteredGyms(); //Function to start filtering process
+
+});
+
+// Store the current filter results
+let currentFilters = {
+    sports: [],
+    location: false,
+    weather: false,
+};
+
+
+async function getFilteredGyms() {
+ 
+  // Update the current filters based on the user input
+  currentFilters.sports = Array.from(sportFilter.selectedOptions).map((option) => option.value);
+  currentFilters.location = locationFilter.checked;
+  currentFilters.weather = weatherFilter.checked;
+
+  // Execute sFilter if sports is selected
+  if(currentFilters.sports.length > 0){
+    console.log("filter: s " + currentFilters.sports);
+    sFilter(currentFilters.sports);
+    setTimeout(function(){    
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = ""; // Clear previous output
+      const gymsList = document.createElement("ul");
+      sportFilArr.forEach(function(gymName) {
+        const gymItem = document.createElement("li");
+        const gymNameNode = document.createTextNode(gymName);
+        gymItem.appendChild(gymNameNode);
+        gymsList.appendChild(gymItem);
+      });
+      outputDiv.appendChild(gymsList);
+    }, 150);
+  }
+
+  // Execute wFilter if weather is selected
+  if(currentFilters.weather) {
+    console.log("filter: w");
+    wFilter();
+    setTimeout(function(){  
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = ""; // Clear previous output
+      const gymsList = document.createElement("ul");
+      weaFilArray.forEach(function(gymName) {
+        const gymItem = document.createElement("li");
+        const gymNameNode = document.createTextNode(gymName);
+        gymItem.appendChild(gymNameNode);
+        gymsList.appendChild(gymItem);
+      });
+      outputDiv.appendChild(gymsList);
+    }, 6000);
+  }
+
+  // Execute Lfilter if location is selected
+  if(currentFilters.location) {
+    console.log("filter: l");
+    Lfilter();
+    setTimeout(function(){  
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = ""; // Clear previous output
+      const gymsList = document.createElement("ul");
+      locFilArr.forEach(function(gymName) {
+        const gymItem = document.createElement("li");
+        const gymNameNode = document.createTextNode(gymName);
+        gymItem.appendChild(gymNameNode);
+        gymsList.appendChild(gymItem);
+      });
+      outputDiv.appendChild(gymsList);
+    }, 300);
+  }
+
+  // Find the intersection of the filtered gym arrays
+  var arr = [sportFilArr,weaFilArray,locFilArr];
+  let result;
+  setTimeout(function(){    
+    result = arr.reduce((a, b) => a.filter(c => b.includes(c)));
+    const outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = result.join(", "); // Join gym names with comma separator
+  }, 10000);
+}
+
+
+const checkEmailExists = async (email) => {
+    const userRef = doc(db, 'Userlist', email);
+    const docSnapshot = await getDoc(userRef);
+    return docSnapshot.exists();
+  };
+
+//Function to filter sports facilities by Type of Sports
+async function sFilter(sportsArray){
+    const email = prompt("Please enter your email:");
+
+    // Check if email is provided and not empty
+    if (!email || email.trim() === "") {
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = "Email is required." ;
+      return;
+    }
+    
+    // Check if email exists in the database
+    const emailExists = await checkEmailExists(email);
+    if (!emailExists) {
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = 'User with email', {email} ,'does not exist';
+      return;
+    }
+    //Creates a query object q3 that references a collection of documents in Firestore using the queryref variable. 
+    //The query function is used to apply a filter to the query by specifying that the sportsType field must contain any of the values in the sportsArray
+    q3 = query(queryref, where('sportsType', 'array-contains-any', sportsArray));
+
+        //The getDocs function is called on the q3 query object to retrieve the matching documents as a query snapshot.
+        getDocs(q3)
+        .then((querySnapshot) => {
+
+            //The code then iterates over each document in the query snapshot using the forEach function and 
+            //extracts the data for each document using the data method. 
+            //In this case, the code retrieves the name field from each document and adds it to an array called sportFilArr.
+            querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const fName = doc.data().name;
+            sportFilArr.push(fName);
+            
+            addUserSportsType(email,currentFilters.sports) ;
+            addUserLocations(email, sportFilArr) ;
+
+        });
+        })
+        
+}
+
+//The following code retrieves weather forecast data from an API, 
+//processes the data, and stores the relevant data in a Firestore collection. 
+function getWeather(){
+
+    //Use the fetch function to make a request to the Data.gov.sg API and
+    //Retrieve the weather forecast data for a specific date. 
+    //The API returns a promise that resolves to a response object.
+    const weather = fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast?date=2023-03-20') //2023-01-10
+    .then(response => response.json()) //Use the response.json() method to extract the JSON data from the response object. This also returns a promise that resolves to the JSON data.
+    .then(data => {
+        return data.items[0]; //Extract the relevant data from the JSON data using dot notation and return the first item in the items array.
+    });
+
+    const saveWeather = async() => { //Declare an asynchronous function saveWeather that waits for the weather promise to resolve 
+        //and then extracts the forecast data for each of the 47 areas in the JSON data.
+        const data = (await weather);
+        for (let i = 0; i<47; i++) {
+            const area = data.forecasts[i].area;
+            const forecast = data.forecasts[i].forecast;
+    
+            //For each area in the forecast data, create a Firestore document reference using the doc method and the relevant collection name, document name, and area name. 
+            //This stores each Area name and its corresponding weather type in the database document
+            const docOne = doc(db, "Weather_forecasts", area + " document"); //db, collectionName, documentName
+            setDoc(docOne, {
+                Area: area,
+                Forecast: forecast }, { merge: true });
+            }
+    };
+    saveWeather(); //Call the saveWeather function to store the forecast data in Firestore.
+
+}
+
+//This code uses the Firestore database service to filter out areas that are not experiencing rain, based on the weather forecast data stored in the Firestore collection.
+async function wFilter(){
+    const email = prompt("Please enter your email:");
+
+    // Check if email is provided and not empty
+    if (!email || email.trim() === "") {
+      outputDiv.innerHTML = "Email is required.";
+      return;
+    }
+    
+    // Check if email exists in the database
+    const emailExists = await checkEmailExists(email);
+    if (!emailExists) {
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = (`User with email ${email} does not exist`);
+      return;
+    }
+    //Call the getWeather function to retrieve the weather forecast data and store it in the Firestore collection
+    //getWeather();
+    //Declare a Firestore database reference to the Weather_forecasts collection using the collection method.
+    const Weather_forecastRef = collection(db,"Weather_forecasts")
+    //Create a Firestore query that filters the documents based on the Forecast field value, which contains the weather forecast data for each area.
+    const q = query(Weather_forecastRef, where('Forecast', 'in', ['Partly Cloudy (Day)', 'Partly Cloudy (Night)', 'Cloudy', 'Partly Cloudy', 'Fair & Warm', 'Fair (Night)', 'Fair (Day)']));
+
+    //Create an empty array areas to store the names of areas that are not experiencing rain
+    let areas = []; //all areas option where its is not raining
+
+    //Use the getDocs method to retrieve the documents that match the Firestore query
+    getDocs(q)
+    //Iterate over the documents using the querySnapshot.forEach method and extract the area name from each document.
+        .then((querySnapshot) => { 
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const area = data.Area; 
+            areas.push(area);//Push each area name into the areas array.
+        });
+        
+        //Call the displayAreas function with the areas array as an argument
+        setTimeout(() => {
+            displayAreas(areas);
+        }, 5000);
+        
+        })
+
+        .catch((error) => {
+          const outputDiv = document.getElementById("output");
+          outputDiv.innerHTML = "Error getting documents: ", error;
+        });
+
+
+        //After getting all areas that are not raining,
+        //the function finds out the sports facilities located at those areas that are not raining
+        //which will be the result of the filtering
+        function displayAreas(areas) {
+
+            let count;
+            if(areas.length%9==0){
+                count= (areas.length/9);
+            }
+            else{
+                count= ((areas.length-areas.length%9)/9)+1;
+            }
+            
+
+            for (let i = 0; i<count*9; i+=9) { 
+                let k=i+9;
+                const slicedArray = areas.slice(i,i+9); //for all areas where its is not raining, can only displayed up to 8 locations if users choose all areas that are not raining
+    
+                const Gym_collectionRef = collection(db,"Gym_collection")
+
+                if(slicedArray.length == 0){
+                  const outputDiv = document.getElementById("output");
+                  outputDiv.innerHTML = ("All areas are raining today!")
+                } else{
+                    const q2 = query(Gym_collectionRef, where('area', 'in', slicedArray)); 
+                   
+                    getDocs(q2)
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const fName = data.name;
+                        weaFilArray.push(fName);
+                        //sportFilArr.push(fName);
+                        //console.log(fName);
+                        });
+                    })
+                    .catch((error) => {
+                      const outputDiv = document.getElementById("output");
+                      outputDiv.innerHTML = ("Error getting documents: ", error);
+                    });
+                }
+            }
+
+            
+
+            // setTimeout(function(){
+            //     console.log("w in filter : "+weaFilArray);
+
+            // }, 500);
+        }
+        addUserLocations(email, weaFilArray)
+   
+}
+
+//This code uses the Firestore database service to filter out sports facilities that are within 10km of the user's live location
+async function Lfilter(){
+    const email = prompt("Please enter your email:");
+
+    // Check if email is provided and not empty
+    if (!email || email.trim() === "") {
+      outputDiv.innerHTML = ("Email is required.");
+      return;
+    }
+    
+    // Check if email exists in the database
+    const emailExists = await checkEmailExists(email);
+    if (!emailExists) {
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = (`User with email ${email} does not exist`);
+      return;
+    }
+    // Define the getPosition function to get user's geolocation
+    function getPosition() {
+        return new Promise(function(resolve, reject) {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+              userLat = position.coords.latitude; //Store user's latitude
+              userLong = position.coords.longitude; //Store user's longitude
+              resolve();
+            }, function(error) {
+              reject(error);
+            });
+          } else {
+            reject("Geolocation is not supported by this browser.");
+          }
+        });
+      }
+      
+      //Call the getPosition function to get user's geolocation
+      getPosition().then(async function() {
+
+        // Get the sport facilities data from gym_collection Firestore
+        const querySnapshot = await getDocs(collection(db,"Gym_collection"));
+
+        //Loop through the all the sport facilities data from gym_collection Firestore
+        querySnapshot.forEach(doc=>{
+            dataLong = doc.data().longtitude; //Store longitude
+            dataLat = doc.data().latitude; //Store latitude
+
+            const toRadians = (angle) => angle * (Math.PI / 180);
+
+            // Convert latitudes and longitudes to radians
+            const lat1Rad = toRadians(userLat);
+            const lon1Rad = toRadians(userLong);
+            const lat2Rad = toRadians(dataLat);
+            const lon2Rad = toRadians(dataLong);
+
+            // Calculate the differences between the latitudes and longitudes of database data and user data
+            const dLat = lat2Rad - lat1Rad;
+            const dLon = lon2Rad - lon1Rad;
+
+            // Apply the Haversine formula
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            // Earth's mean radius in kilometers (approximately 6,371 km)
+            const R = 6371;
+
+            // Calculate and store the sports facilities data if it's within 10km of the users live location
+            const distance = R * c;
+            
+            if(distance<20){ 
+                locFilArr.push(doc.data().name);
+            }
+
+    
+    });
+        }).catch(function(error) {
+            console.error(error);
+        });
+        addUserLocations(email,locFilArr) ;
+}
+
+const addUserSportsType = async (email, sportsType) => {
+    try {
+      const userRef = doc(db, 'Userlist', email);
+      const docSnapshot = await getDoc(userRef);
+  
+      if (!docSnapshot.exists()) {
+        throw new Error(`User with email ${email} does not exist`);
+      }
+  
+      await updateDoc(userRef, {
+        sportsType: sportsType
+      });
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = (`Successfully added sports type ${sportsType} for user with email ${email}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+ 
+  const addUserLocations = async (email, resultslocation) => {
+    try {
+      const userRef = doc(db, 'Userlist', email);
+      const docSnapshot = await getDoc(userRef);
+  
+      if (!docSnapshot.exists()) {
+        throw new Error(`User with email ${email} does not exist`);
+      }
+  
+      await updateDoc(userRef, {
+        location:resultslocation
+      });
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = (`Successfully added location ${resultslocation} for user with email ${email}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  
+
+</script>
+
+</body>
+</html>

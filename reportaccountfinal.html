@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <title>Report Account</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-image: url('background.jpg'); 
+        background-size: cover;
+      }
+      .container {
+        max-width: 600px;
+        text-align: center;
+        margin-left: 30%;
+        margin:auto;
+        margin-top: 9%;
+        background-color:rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+      }
+      label {
+        margin-bottom: 10px;
+        font-weight: bold;
+        display: block;
+      }
+      input[type="email"],
+      input[type="text"] {
+        padding: 10px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 100%;
+      }
+      input[type="submit"] {
+        padding: 10px 20px;
+        background-color: blue;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      input[type="submit"]:hover {
+        background-color: darkblue;
+      }
+
+      .signup_link{
+        margin: 3%;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Report Account</h1>
+      <form action="">
+        <label for="Namebox">Enter your name:</label>
+        <input type="text" required id="Namebox" name="Namebox">
+        <label for="Accountbox">Enter the reported account:</label>
+        <input type="text" required id="Accountbox" name="Accountbox">
+        <label for="Reasonbox">Enter the reason for reporting:</label>
+        <input type="text" required id="Reasonbox" name="Reasonbox">
+        <label for="email">Email:</label>
+        <input type="email" required id="email" name="email">
+        <input type="submit" value="Submit">
+      </form>
+      <div class="signup_link">
+        <a href="login.html">Login</a>
+        or
+        <a href="registerfinal.html">Register</a>
+        or
+        <a href="mainpage.html">Continue as guest</a>
+      </div>
+    </div>
+  </body>
+</html>

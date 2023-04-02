@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User Details</title>
+
+</head>
+<title>Update Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url("background.jpg");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    div {
+      border:1px solid black;
+      padding:20px;
+      width:50%;
+      background-color: white;
+      text-align: center;
+    }
+    label {
+      font-weight:bold;
+      display:block;
+      margin-bottom: 10px;
+    }
+    input {
+      margin-bottom: 20px;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
+    }
+    hr {
+      margin: 20px 0;
+    }
+    button {
+      font-weight:bold;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #3e8e41;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Update Profile</h1>
+    <label for="Emailbox">Old Email</label>
+    <input id="Emailbox" type="text">
+
+    <label for="NewNamebox">New Name</label>
+    <input id="NewNamebox" type="text">
+
+    <label for="NewGenderbox">New Gender</label>
+    <input id="NewGenderbox" type="text">
+
+    <label for="NewTelegramIDbox">New Telegram ID</label>
+    <input id="NewTelegramIDbox" type="text">
+
+    <label for="NewContactbox">New Contact Info</label>
+    <input id="NewContactbox" type="text">
+    <hr>
+
+    <button id="Updatebtn">UPDATE</button>
+  </div>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbyiewHyshcRadjps4bYrs1IhoDcyJPgM",
+            authDomain: "sc2006-website.firebaseapp.com",
+            databaseURL: "https://sc2006-website-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sc2006-website",
+            storageBucket: "sc2006-website.appspot.com",
+            messagingSenderId: "140548370620",
+            appId: "1:140548370620:web:26bea8bb411408da4e60b9",
+            measurementId: "G-NCGC3EKYZ2"
+          };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        
+        import {getFirestore, doc, getDoc,setDoc,collection, addDoc,updateDoc,deleteDoc,deleteField} 
+        from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js"
+            
+        const db = getFirestore();
+
+        let Emailbox = document.getElementById('Emailbox');
+   
+
+        let Updatebtn = document.getElementById("Updatebtn");
+
+        async function UpdateDocument() {
+            if (validateEmail()) {
+              const email = Emailbox.value.trim();
+              const userRef = doc(db, "Userlist", email);
+              const userDoc = await getDoc(userRef);
+              if (userDoc.exists()) {
+                try {
+                  const updates = {};
+                  if (NewTelegramIDBox.value) {
+                    updates.TelegramID = NewTelegramIDBox.value;
+                  }
+                  if (NewGenderbox.value) {
+                    updates.Gender = NewGenderbox.value;
+                  }
+                  if (NewNamebox.value) {
+                    updates.full_name = NewNamebox.value;
+                  }
+                  if (NewContactbox.value) {
+                    updates.Contact = NewContactbox.value;
+                  }
+                  await updateDoc(userRef, updates);
+                  alert("User details updated successfully.");
+                } catch (error) {
+                  alert("Failed to update user details, error: " + error);
+                }
+              } else {
+                alert("User with this email does not exist.");
+              }
+            }
+          }
+          
+        Updatebtn.addEventListener("click", UpdateDocument);
+
+        function validateEmail(){
+            let email = Emailbox.value.trim();
+            if(email === ""){
+                alert("Please enter the email address of the user to be updated.");
+                return false;
+            }
+            else if(!/\S+@\S+\.\S+/.test(email)){
+                alert("Please enter a valid email address.");
+                return false;
+            }
+            return true;
+        }
+
+        
+    </script>
