@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Populate Firestore Database</title>
+  </head>
+  <body>
+    <button id="Populatebtn">Populate</button>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js";
+      import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        setDoc,
+        collection,
+        addDoc,
+        updateDoc,
+        deleteDoc,
+        deleteField,
+      } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCoJmkNZlrOU4dBcfouvXMKMQfKr64Anls",
+    authDomain: "test-1fcb5.firebaseapp.com",
+    databaseURL: "https://test-1fcb5-default-rtdb.firebaseio.com",
+    projectId: "test-1fcb5",
+    storageBucket: "test-1fcb5.appspot.com",
+    messagingSenderId: "319019467913",
+    appId: "1:319019467913:web:1f841cea126d4e4a377258",
+    measurementId: "G-8MHESTV8C6"
+    };
+
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      let Populatebtn = document.getElementById("Populatebtn");
+
+      // Function to populate the database
+      function populateDatabase() {
+        for (let i = 10; i<100; i++){
+          const washingtonRef = doc(db, "Gym_collection", "ID_000"+i);
+          setDoc(washingtonRef, {
+           sportsType:["All Sports","Dance", "Frisbee", "Swimming", "Table Tennis","Basketball"] }, { merge: true }); }}
+      Populatebtn.addEventListener("click", populateDatabase);
+    </script>
+  </body>
+</html>
